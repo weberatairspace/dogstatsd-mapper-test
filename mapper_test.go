@@ -21,41 +21,42 @@ func TestMapper(t *testing.T) {
 			ExpectedNilResult: true,
 		},
 		{
-			Input:             "nsq.statsd.topic.topic-name.metric-name",
+			Input:             "nsq.statsd.topic.top-name.metric-name",
 			ExpectedName:      "nsq.statsd.topic.metric-name",
-			ExpectedTags:      []string{"nsq_topic:topic-name"},
+			ExpectedTags:      []string{"nsq_topic:top-name"},
 			ExpectedNilResult: false,
 		},
 		{
-			Input:             "nsq.statsd.topic.topic.name.metric-name",
+			Input:             "nsq.statsd.topic.top.name.metric-name",
 			ExpectedName:      "nsq.statsd.topic.metric-name",
-			ExpectedTags:      []string{"nsq_topic:topic.name"},
+			ExpectedTags:      []string{"nsq_topic:top.name"},
 			ExpectedNilResult: false,
 		},
 		{
-			Input:             "nsq.statsd.topic.topic-name.channel.channel-name.metric-name",
+			Input:             "nsq.statsd.topic.top-name.channel.chan-name.metric-name",
 			ExpectedName:      "nsq.statsd.topic.channel.metric-name",
-			ExpectedTags:      []string{"nsq_topic:topic-name", "nsq_channel:channel-name"},
+			ExpectedTags:      []string{"nsq_topic:top-name", "nsq_channel:chan-name"},
 			ExpectedNilResult: false,
 		},
 		{
-			Input:             "nsq.statsd.topic.topic.name.channel.channel.name.metric-name",
+			Input:             "nsq.statsd.topic.top.name.channel.chan.name.metric-name",
 			ExpectedName:      "nsq.statsd.topic.channel.metric-name",
-			ExpectedTags:      []string{"nsq_topic:topic.name", "nsq_channel:channel.name"},
+			ExpectedTags:      []string{"nsq_topic:top.name", "nsq_channel:chan.name"},
 			ExpectedNilResult: false,
 		},
 	}
 
-	mapper, err := getMapper(`dogstatsd_mapper_profiles:
+	mapper, err := getMapper(`
+dogstatsd_mapper_profiles:
 - mappings:
-  - match: nsq.statsd.topic.*.channel.*.*
-    match_type: wildcard
+  - match: 'nsq\.statsd\.topic\.(.+)\.channel\.(.+)\.([^\.]+)'
+    match_type: regex 
     name: nsq.statsd.topic.channel.$3
     tags:
       nsq_channel: $2
       nsq_topic: $1
-  - match: nsq.statsd.topic.*.*
-    match_type: wildcard
+  - match: 'nsq\.statsd\.topic\.(.+)\.([^\.]+)'
+    match_type: regex
     name: nsq.statsd.topic.$2
     tags:
       nsq_topic: $1
