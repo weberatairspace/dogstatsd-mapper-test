@@ -50,6 +50,13 @@ func TestMapper(t *testing.T) {
 			ExpectedTags:      []string{"nsq_topic:app.candidates", "nsq_channel:app.something.candidate"},
 			ExpectedNilResult: false,
 		},
+		{
+
+			Input:             "nsq.statsd.topic.app.commands.message_count",
+			ExpectedName:      "nsq.statsd.topic.message_count",
+			ExpectedTags:      []string{"nsq_topic:app.commands"},
+			ExpectedNilResult: false,
+		},
 	}
 
 	mapper, err := getMapper(`
