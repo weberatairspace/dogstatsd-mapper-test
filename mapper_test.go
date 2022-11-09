@@ -44,24 +44,30 @@ func TestMapper(t *testing.T) {
 			ExpectedTags:      []string{"nsq_topic:top.name", "nsq_channel:chan.name"},
 			ExpectedNilResult: false,
 		},
+		{
+			Input:             "nsq.statsd.topic.app.candidates.channel.app.something.candidate.backend_depth",
+			ExpectedName:      "nsq.statsd.topic.channel.backend_depth",
+			ExpectedTags:      []string{"nsq_topic:app.candidates", "nsq_channel:app.something.candidate"},
+			ExpectedNilResult: false,
+		},
 	}
 
 	mapper, err := getMapper(`
 dogstatsd_mapper_profiles:
-- mappings:
-  - match: 'nsq\.statsd\.topic\.(.+)\.channel\.(.+)\.([^\.]+)'
-    match_type: regex 
-    name: nsq.statsd.topic.channel.$3
-    tags:
-      nsq_channel: $2
-      nsq_topic: $1
-  - match: 'nsq\.statsd\.topic\.(.+)\.([^\.]+)'
-    match_type: regex
-    name: nsq.statsd.topic.$2
-    tags:
-      nsq_topic: $1
-  name: nsq_statsd_metric_mapper_profile
-  prefix: nsq.`)
+  - mappings:
+    - match: 'nsq\.statsd\.topic\.(.+)\.channel\.(.+)\.([^\.]+)'
+      match_type: regex 
+      name: nsq.statsd.topic.channel.$3
+      tags:
+        nsq_channel: $2
+        nsq_topic: $1
+    - match: 'nsq\.statsd\.topic\.(.+)\.([^\.]+)'
+      match_type: regex
+      name: nsq.statsd.topic.$2
+      tags:
+        nsq_topic: $1
+    name: nsq_statsd_metric_mapper_profile
+    prefix: nsq.`)
 
 	if err != nil {
 		t.Fatalf("failed to create mapper: %v", err)
